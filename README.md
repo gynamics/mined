@@ -12,16 +12,16 @@ gcc -o mined mined.c
 ## Usage
 MINED is a simple REPL-based regular file editor, it has 8 commands:
 
-| Command | Syntax           | Explanation                       |
-|---------|------------------|-----------------------------------|
-| `o`     | `o[STRING]`      | Open a file for edit              |
-| `c`     | `c`              | Close current file                |
-| `p`     | `p[NUM][,[NUM]]` | Print a line or a range of lines  |
-| `g`     | `g[NUM]`         | Goto begining of a line           |
-| `i`     | `i[STRING]`      | Insert string at current point    |
-| `d`     | `d[NUM][,[NUM]]` | Delete a line or a range of lines |
-| `e`     | `e[NUM]`         | Edit a line                       |
-| `q`     | `q`              | Quit                              |
+| Command | Syntax           | Explanation                                    |
+|---------|------------------|------------------------------------------------|
+| `o`     | `o[STRING]`      | Open a file for edit                           |
+| `p`     | `p[NUM][,[NUM]]` | Print a line or a range of lines               |
+| `g`     | `g[NUM][:[NUM]]` | Move point to specific position in a line      |
+| `i`     | `i[STRING]`      | Insert a line at current point                 |
+| `a`     | `a[STRING]`      | Insert a string at current point               |
+| `d`     | `d[NUM][,[NUM]]` | Delete a line or a range of lines              |
+| `x`     | `x[NUM]`         | Delete characters                              |
+| `e`     | `e[NUM][:[NUM]]` | Edit a line from specific position to line end |
 
 The REPL's line editor provides a small set of GNU `readline` features:
 - Use left/right arrow keys for cursor navigation.
@@ -30,6 +30,7 @@ The REPL's line editor provides a small set of GNU `readline` features:
 - Use up/down arrow keys to use the history ring.
 - `C-g` for abort.
 - Use `backspace`/`delete` keys for backward/foreward character deletion.
+- `C-d` and `C-c` signals are also available, you can use these for exiting.
 
 MINED is scriptable, however, `e` command can not be programmed in MINED,
 because currently it only supports editing ASCII characters.
