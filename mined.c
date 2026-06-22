@@ -58,22 +58,17 @@ int goto_line(int n) {
 
 int goto_char(int n) {
   int loff = 0;
-  int fo = foff;
+  int fo = lseek(fd, 0, SEEK_CUR);
   if (n == 0)
     return 0;
   for (;;) {
     int len = read(fd, fbu, LBSZ);
     char *p;
-    for (p = fbu, ++loff; p < fbu + len; ++p, ++loff) {
-      if (loff == n) {
+    for (p = fbu; p < fbu + len; ++p, ++loff) {
+      if (loff > n || *p == '\n') {
         fo += loff;
         lseek(fd, fo, SEEK_SET);
-        return loff;
-      } else if (*p == '\n') {
-        if (loff > 0)
-          fo += (n % loff + loff) % loff;
-        lseek(fd, fo, SEEK_SET);
-        return fo - foff;
+        return fo;
       }
     }
     if (len < LBSZ) // EOF
@@ -101,7 +96,8 @@ void print_lines(int lb, int le) {
     char *p;
     for (p = fbu; p < fbu + len; ++p, ++off) {
       printf((off != foff) ? "%c"
-                           : (*p != '\n' ? "\e[7m%c\e[0m" : "\e[7m %c\e[0m"),
+                           : ((*p != '\n' && *p != '\t') ? "\e[7m%c\e[0m"
+                                                         : "\e[7m %c\e[0m"),
              *p);
       if (*p == '\n') {
         if (lb++ == le)
@@ -240,7 +236,7 @@ int mined_o(char *args) {
     return fd;
 }
 
-void anl(int d) {
+void anl(int d) { // append newlines
   int cnt = 0;
   lseek(fd, 0, SEEK_END);
   while (cnt < d) {
@@ -328,8 +324,7 @@ int mined_g(char *args) {
     QUERY(("LINE %d NOT EXIST, CREATE IT?(y/n)", rn), anl(rn - m))
   }
   cl = m;
-  foff = lseek(fd, 0, SEEK_CUR); // save file offset
-  foff += goto_char(cn);
+  foff = goto_char(cn);
   printf("GOTO %d:%d, FILE OFFSET=%ld\n", rn, cn, foff);
   print_lines(rn, rn);
   return 0;
